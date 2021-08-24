@@ -23,7 +23,7 @@ function git_wsl2 () {
 }
 
 function git_windows () {
-  local args=()
+  local args=''
 
   echo_debug 'Using Windows git'
   echo_debug "is_needing_auth: $(is_needing_auth)"
@@ -34,14 +34,14 @@ function git_windows () {
     if [[ $x =~ ^/ ]] ; then
       # TODO: Remove this disabling
       # shellcheck disable=SC2207
-      args+=($(wslpath -w "$x" | sed -r 's/\\/\\\\/g' ))
+      args="$args '$(wslpath -w "$x" | sed -r 's/\\/\\\\/g')'"
       continue
     fi
 
-    args+=("$x")
+    args="$args '$x'"
   done
 
-  eval "git.exe ${args[*]}"
+  eval "git.exe $args"
 }
 
 function should_use_windows_git () {
