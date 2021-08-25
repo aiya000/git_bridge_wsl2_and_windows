@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Arguments
-
-sub_cmd=$1
-
 # Environment variables
 
 if [[ -z $GIT_BRIDGE_WSL2_AND_WINDOWS_DEBUG ]] ; then
@@ -25,7 +21,7 @@ git_windows=$GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WINDOWS
 # Functions
 
 function main () {
-  if [[ $GIT_BRIDGE_WSL2_AND_WINDOWS_USE_WSL2 -ne 0 ]] || [[ $(is_needing_auth) = true ]] ; then
+  if [[ $GIT_BRIDGE_WSL2_AND_WINDOWS_USE_WSL2 -ne 0 ]]  ; then
     exec_git_wsl2 "$@"
   elif [[ $GIT_BRIDGE_WSL2_AND_WINDOWS_USE_WINDOWS -ne 0 ]] || [[ $(should_use_windows_git) = true ]] ; then
     exec_git_windows "$@"
@@ -37,7 +33,6 @@ function main () {
 
 function exec_git_wsl2 () {
   echo_debug 'Using WSL2 git'
-  echo_debug "is_needing_auth: $(is_needing_auth)"
   echo_debug "should_use_windows_git: $(should_use_windows_git)"
   echo_debug "/usr/bin/git $*"
 
@@ -48,7 +43,6 @@ function exec_git_windows () {
   local args=''
 
   echo_debug 'Using Windows git'
-  echo_debug "is_needing_auth: $(is_needing_auth)"
   echo_debug "should_use_windows_git: $(should_use_windows_git)"
   echo_debug "$git_windows $*"
 
@@ -76,19 +70,6 @@ function should_use_windows_git () {
   else
     echo false
   fi
-}
-
-function is_needing_auth () {
-  local command_needs_auth=(push pull fetch) cmd
-
-  for cmd in "${command_needs_auth[@]}" ; do
-    if [[ $sub_cmd = "$cmd" ]] ; then
-      echo true
-      return
-    fi
-  done
-
-  echo false
 }
 
 function echo_debug () {
