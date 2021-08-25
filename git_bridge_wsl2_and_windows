@@ -4,9 +4,9 @@ DEBUG=0
 sub_cmd=$1
 
 function main () {
-  if [[ $(is_needing_auth) = true ]] ; then
+  if [[ $GIT_BRIDGE_WSL2_AND_WINDOWS_USE_WSL2 -ne 0 ]] || [[ $(is_needing_auth) = true ]] ; then
     git_wsl2 "$@"
-  elif [[ $(should_use_windows_git) = true ]] ; then
+  elif [[ $GIT_BRIDGE_WSL2_AND_WINDOWS_USE_WINDOWS -ne 0 ]] || [[ $(should_use_windows_git) = true ]] ; then
     git_windows "$@"
   else
     # By default
