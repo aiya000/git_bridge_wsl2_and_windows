@@ -1,34 +1,54 @@
 #!/bin/bash
 
-DEBUG=0
+# Arguments
+
 sub_cmd=$1
+
+# Environment variables
+
+DEBUG=0
+
+if [[ -z $GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WSL2 ]] ; then
+  GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WSL2=/usr/bin/git
+fi
+
+if [[ -z $GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WINDOWS ]] ; then
+  GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WINDOWS=git.exe
+fi
+
+# Shorten name
+git_wsl2=$GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WSL2
+git_windows=$GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WINDOWS
+
+# Functions
 
 function main () {
   if [[ $GIT_BRIDGE_WSL2_AND_WINDOWS_USE_WSL2 -ne 0 ]] || [[ $(is_needing_auth) = true ]] ; then
-    git_wsl2 "$@"
+    exec_git_wsl2 "$@"
   elif [[ $GIT_BRIDGE_WSL2_AND_WINDOWS_USE_WINDOWS -ne 0 ]] || [[ $(should_use_windows_git) = true ]] ; then
-    git_windows "$@"
+    exec_git_windows "$@"
   else
     # By default
-    git_wsl2 "$@"
+    exec_git_wsl2 "$@"
   fi
 }
 
-function git_wsl2 () {
+function exec_git_wsl2 () {
   echo_debug 'Using WSL2 git'
   echo_debug "is_needing_auth: $(is_needing_auth)"
   echo_debug "should_use_windows_git: $(should_use_windows_git)"
   echo_debug "/usr/bin/git $*"
-  /usr/bin/git "$@"
+
+  $git_wsl2 "$@"
 }
 
-function git_windows () {
+function exec_git_windows () {
   local args=''
 
   echo_debug 'Using Windows git'
   echo_debug "is_needing_auth: $(is_needing_auth)"
   echo_debug "should_use_windows_git: $(should_use_windows_git)"
-  echo_debug "git.exe $*"
+  echo_debug "$git_windows $*"
 
   for x in "$@"; do
     if [[ $x =~ ^/ ]] ; then
@@ -41,7 +61,7 @@ function git_windows () {
     args="$args '$x'"
   done
 
-  eval "git.exe $args"
+  eval "$git_windows $args"
 }
 
 function should_use_windows_git () {
