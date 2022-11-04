@@ -72,10 +72,12 @@ function exec_git_windows () {
 }
 
 function should_use_windows_git () {
+  local pwd=$(pwd -P)
+
   if \
-    [[ $PWD =~ ^/mnt ]] \
-    || [[ $PWD =~ ^/home/$USER/Windows ]] \
-    || [[ $PWD =~ ^/home/$USER/Desktop ]] ; \
+    [[ $pwd =~ ^/mnt ]] \
+    || [[ $pwd =~ ^/home/$USER/Windows ]] \
+    || [[ $pwd =~ ^/home/$USER/Desktop ]] ; \
   then
     echo true
   else
