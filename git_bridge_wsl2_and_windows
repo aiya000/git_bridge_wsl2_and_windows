@@ -14,6 +14,10 @@ if [[ -z $GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WINDOWS ]] ; then
   GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WINDOWS=git.exe
 fi
 
+if [[ -z $GIT_BRIDGE_WSL2_AND_WINDOWS_DIRECT ]] ; then
+  GIT_BRIDGE_WSL2_AND_WINDOWS_DIRECT=0
+fi
+
 # Shorten name
 git_wsl2=$GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WSL2
 git_windows=$GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WINDOWS
@@ -40,13 +44,19 @@ function exec_git_wsl2 () {
 }
 
 function exec_git_windows () {
+  echo_debug 'Using Windows git'
+  echo_debug "direct: $GIT_BRIDGE_WSL2_AND_WINDOWS_DIRECT"
+  echo_debug "should_use_windows_git: $(should_use_windows_git)"
+  echo_debug "specified: $git_windows $*"
+
+  if [[ $GIT_BRIDGE_WSL2_AND_WINDOWS_DIRECT -ne 0 ]] ; then
+    $git_windows "$@"
+    return $?
+  fi
   local args=''
 
-  echo_debug 'Using Windows git'
-  echo_debug "should_use_windows_git: $(should_use_windows_git)"
-  echo_debug "$git_windows $*"
-
   for x in "$@"; do
+    echo_debug "arg: $x"
     if [[ $x =~ ^/ ]] ; then
       # TODO: Remove this disabling
       # shellcheck disable=SC2207
@@ -57,6 +67,7 @@ function exec_git_windows () {
     args="$args '$x'"
   done
 
+  echo_debug "will: $git_windows $args"
   eval "$git_windows $args"
 }
 
