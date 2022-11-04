@@ -2,8 +2,8 @@
 
 # Environment variables
 
-if [[ -z $GIT_BRIDGE_WSL2_AND_WINDOWS_DEBUG ]] ; then
-  GIT_BRIDGE_WSL2_AND_WINDOWS_DEBUG=0
+if [[ -z $DEBUG ]] ; then
+  DEBUG=0
 fi
 
 if [[ -z $GIT_BRIDGE_WSL2_AND_WINDOWS_GIT_WSL2 ]] ; then
@@ -73,7 +73,7 @@ function should_use_windows_git () {
 }
 
 function echo_debug () {
-  if [[ $GIT_BRIDGE_WSL2_AND_WINDOWS_DEBUG -eq 1 ]] ; then
+  if [[ $DEBUG -eq 1 ]] ; then
     echo "git_bridge_wsl2_and_windows: $*"
   fi
 }
